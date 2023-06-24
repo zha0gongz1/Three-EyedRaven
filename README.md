@@ -1,5 +1,8 @@
 ## Three-EyedRaven
 
+中文文档 | [README in English](./README_EN.md)
+
+<hr/>
 一款内网探测工具，详细介绍请阅读[此文](https://www.cnblogs.com/zha0gongz1/p/17400520.html)。
 
 ## 使用方法：
