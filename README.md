@@ -39,10 +39,12 @@ Three-EyedRaven brute -H 192.168.233.11 -S ssh -P 2222 -u 1.txt -p 2.txt
 Three-EyedRaven brute -H 192.168.233.11 -S ftp -t 50 -p pass.txt   
 ```
 
-
 ## ToDo: 
 
 - RDP服务认证爆破；
 
 - 检测端口，识别SqlServer、Mysql、Redis等服务；
 
+## License
+
+The MIT License.
