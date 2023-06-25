@@ -72,14 +72,25 @@ type HostPort struct {
 	Port string
 }
 
-func DetectFunc(ipd *string, NoWebDetect *bool, port *string, thread *int) {
+func DetectFunc(ipd *string, noPing, NoWebDetect *bool, port *string, thread *int) {
 	fmt.Println("[*]Executing detect module...")
-	fmt.Printf("Host:%s, Ports:%s, No web:%v, Threads:%d\n", *ipd, *port, *NoWebDetect, *thread)
-	aliveRes := []string{}
-	aliveFunc(ipd, thread, &aliveRes)
-	logger.AliveLog(&aliveRes)
+	fmt.Printf("Host:%s, Ports:%s, No ping:%v, No web:%v, Threads:%d\n", *ipd, *port, *noPing, *NoWebDetect, *thread)
 
-	var hostPort []string
+	var (
+		aliveRes []string
+		hostPort []string
+		err      error
+	)
+	if *noPing {
+		aliveRes, err = parse.ConvertIpFormatA(*ipd)
+		if err != nil {
+			fmt.Println("parse ips has an error")
+			return
+		}
+	} else {
+		aliveFunc(ipd, thread, &aliveRes)
+		logger.AliveLog(&aliveRes)
+	}
 	switch {
 	case !strings.Contains(*port, ",") && !strings.Contains(*port, "-") && *port != "":
 		fmt.Println("[*]Scaning one port...")
