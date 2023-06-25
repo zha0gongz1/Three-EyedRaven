@@ -3,24 +3,36 @@ package plugins
 import (
 	logger "Three-EyedRaven/config"
 	portdic "Three-EyedRaven/config"
+	parseIP "Three-EyedRaven/config"
 	"fmt"
 	"net"
 	"strings"
 	"sync"
 )
 
-func AllFunc(ipd, ports *string, noWeb, noBrute *bool, user, pass string, thread *int) {
+func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, user, pass string, thread *int) {
 	fmt.Println("[*]Executing all module...")
-	fmt.Printf("Host:%s, Ports:%s, No web:%v, No blasting:%v, Threads:%d\n", *ipd, *ports, *noWeb, *noBrute, *thread)
-	aliveRes := []string{}
-	aliveFunc(ipd, thread, &aliveRes)
-	logger.AliveLog(&aliveRes)
+	fmt.Printf("[+]Host:%s, Ports:%s, No ping%v, No web:%v, No blasting:%v, Threads:%d\n", *ipd, *ports, *noPing, *noWeb, *noBrute, *thread)
+	var (
+		aliveRes []string
+		err error
+	)
+	if *noPing {
+		aliveRes, err = parseIP.ConvertIpFormatA(*ipd)
+		if err != nil {
+			fmt.Println("parse ips has an error")
+			return
+		}
+	} else {
+		aliveFunc(ipd, thread, &aliveRes)
+		logger.AliveLog(&aliveRes)
+	}
 
 	var wg1 sync.WaitGroup
 	sem := make(chan struct{}, *thread)
 	portdict := strings.Split(portdic.DefaultPorts, ",")
 	temp := []HostPort{}
-	fmt.Println("[*]Loading default port dictionary top1000...")
+	fmt.Println("[*]Loading default port dict top1000...")
 	//batchSize := 100
 	for i := 0; i < len(portdict); i += 100 {
 		portBatch := portdict[i:min(i+100, len(portdict))]
