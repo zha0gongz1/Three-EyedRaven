@@ -14,12 +14,14 @@ type allFlags struct {
 	User        string
 	Pass        string
 	Thread      int
+	NoPing      bool
 	NoWebDetect bool
 	NoBrute     bool
 }
 
 type detectFlags struct {
 	Hosts       string
+	NoPing      bool
 	NoWebDetect bool
 	Ports       string
 	Thread      int
@@ -62,7 +64,7 @@ var allCmd = &cobra.Command{
 			cost := time.Since(start)
 			fmt.Println("[*]Total Time:", cost)
 		}()
-		plugin.AllFunc(&all.Hosts, &all.Ports, &all.NoWebDetect, &all.NoBrute, all.User, all.Pass, &all.Thread)
+		plugin.AllFunc(&all.Hosts, &all.Ports, &all.NoPing, &all.NoWebDetect, &all.NoBrute, all.User, all.Pass, &all.Thread)
 
 	},
 }
@@ -82,7 +84,7 @@ var detectCmd = &cobra.Command{
 			fmt.Println("[*]Total Time:", cost)
 		}()
 
-		plugin.DetectFunc(&detect.Hosts, &detect.NoWebDetect, &detect.Ports, &detect.Thread)
+		plugin.DetectFunc(&detect.Hosts, &detect.NoPing, &detect.NoWebDetect, &detect.Ports, &detect.Thread)
 	},
 }
 
@@ -110,6 +112,7 @@ func init() {
 	rootCmd.AddCommand(allCmd)
 	allCmd.Flags().StringVarP(&all.Hosts, "hosts", "H", "", "设置扫描的目标参数(.eg) \n[192.168.233.1]\n[172.16.1.1/16]")
 	allCmd.Flags().IntVarP(&all.Thread, "thread", "t", 400, "设置扫描时的扫描线程 (.eg) 默认400线程")
+	allCmd.Flags().BoolVar(&all.NoPing, "np", false, "设置是否进行ping/ICMP探测") 
 	allCmd.Flags().BoolVar(&all.NoWebDetect, "nw", false, "设置是否进行web服务探测")      //指定--nw即为真(不识别web)，不指定就是默认值 false
 	allCmd.Flags().BoolVar(&all.NoBrute, "nb", false, "设置是否进行ftp&ssh&RDP等服务爆破") //指定--nb即为真(不爆破)，不指定就是默认值 false
 	allCmd.Flags().StringVarP(&all.User, "udict", "u", "", "设置扫描时爆破采用的用户名字典 (.eg) 不设置将采用默认用户名字典")
@@ -118,6 +121,7 @@ func init() {
 	rootCmd.AddCommand(detectCmd)
 	detectCmd.Flags().StringVarP(&detect.Hosts, "hosts", "H", "", "设置扫描的目标参数(.eg [-H 192.168.233.1] [-H 172.16.1.1/16])")
 	detectCmd.Flags().IntVarP(&detect.Thread, "thread", "t", 400, "设置扫描时的扫描线程 (.eg) 默认400 线程")
+	detectCmd.Flags().BoolVar(&detect.NoPing, "np", false, "设置是否进行ping/ICMP探测")
 	detectCmd.Flags().BoolVar(&detect.NoWebDetect, "nw", false, "设置是否进行web服务探测")
 	detectCmd.Flags().StringVarP(&detect.Ports, "ports", "P", "", "设置扫描的端口参数(.eg 80,443-445) 不设置将采用默认端口字典 top 1000\"")
 
