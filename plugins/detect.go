@@ -80,6 +80,7 @@ func DetectFunc(ipd *string, noPing, NoWebDetect *bool, port *string, thread *in
 		aliveRes []string
 		hostPort []string
 		err      error
+		TagetBanners []string
 	)
 	if *noPing {
 		aliveRes, err = parse.ConvertIpFormatA(*ipd)
@@ -106,7 +107,14 @@ func DetectFunc(ipd *string, noPing, NoWebDetect *bool, port *string, thread *in
 		break
 	}
 	logger.PortLog(&hostPort)
-
+	fmt.Println("[*]Identifying port service...")
+	if len(hostPort) > 0 {
+		TagetBanners = GetProbes(&hostPort)
+	}
+	for _, taget := range TagetBanners {
+		fmt.Println(taget)
+		logger.PrintInfo(taget)
+	}
 	var netInfoTemp string
 	for _, tmp := range hostPort {
 		if strings.Contains(tmp, ":139") {
