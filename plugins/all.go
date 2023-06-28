@@ -137,7 +137,45 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, user, pass string
 					runTask(ts, thread, "mysql")
 					break
 				}
+			case !*noBrute && strings.Contains(tmp, ":3389"):
+				{
+					fmt.Println("执行RDP服务爆破......")
+					//ToDO:*****
+					break
+				}
+			case !*noBrute && strings.Contains(tmp, ":5432"):
+				{
+					for _, userDict := range portdic.Users["postgresql"] {
+						for _, passDict := range portdic.Passwords {
+							ts = append(ts, Task{strings.Split(tmp, ":")[0], "5432", userDict, passDict})
 
+						}
+					}
+					runTask(ts, thread, "postgresql")
+					break
+				}
+			case !*noBrute && strings.Contains(tmp, ":6379"):
+				{
+					for _, userDict := range portdic.Users["redis"] {
+						for _, passDict := range portdic.Passwords {
+							ts = append(ts, Task{strings.Split(tmp, ":")[0], "6379", userDict, passDict})
+
+						}
+					}
+					runTask(ts, thread, "redis")
+					break
+				}
+			case !*noBrute && strings.Contains(tmp, ":27017"):
+				{
+					for _, userDict := range portdic.Users["mongodb"] {
+						for _, passDict := range portdic.Passwords {
+							ts = append(ts, Task{strings.Split(tmp, ":")[0], "27017", userDict, passDict})
+
+						}
+					}
+					runTask(ts, thread, "mongodb")
+					break
+				}
 			case !*noWeb && !strings.Contains(tmp, ":135") && !strings.Contains(tmp, ":137") && !strings.Contains(tmp, ":139") && !strings.Contains(tmp, ":445"):
 				{
 					webts = append(webts, fmt.Sprintf("http://%s:%s", strings.Split(tmp, ":")[0], strings.Split(tmp, ":")[1]))
