@@ -75,7 +75,7 @@ func PrintNetinfo(res *string) {
 	log.Printf("---------------------------------------------------")
 }
 
-func PrintWeb(res string) {
+func PrintInfo(res string) {
 	logFile, err := os.OpenFile("z.log", os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatal(err)
