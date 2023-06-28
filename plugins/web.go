@@ -75,9 +75,9 @@ func httpdScan(Target []string, threads *int) {
 				bodyLen := len(bodyString)
 				match := re.FindStringSubmatch(bodyString)
 				if len(match) != 0 {
-					logger.PrintWeb(fmt.Sprintf("[%d] %s [%d]\tTitle:%s", resp.StatusCode, url, bodyLen, match[1]))
+					logger.PrintInfo(fmt.Sprintf("[%d] %s [%d]\tTitle:%s", resp.StatusCode, url, bodyLen, match[1]))
 				} else {
-					logger.PrintWeb(fmt.Sprintf("[%d] %s [%d]\tTitle:NULL", resp.StatusCode, url, bodyLen))
+					logger.PrintInfo(fmt.Sprintf("[%d] %s [%d]\tTitle:NULL", resp.StatusCode, url, bodyLen))
 				}
 			}
 			mutex.Unlock()
@@ -91,7 +91,7 @@ func BasicAuthBrute(Target string) {
 		for _, pass := range dict.Passwords {
 			res, err := BasicAuth(Target, user, pass)
 			if res == true && err == nil {
-				logger.PrintWeb(fmt.Sprintf("[+]Basic Brute Success:%s | user:%s | password:%s\n", Target, user, pass))
+				logger.PrintInfo(fmt.Sprintf("[+]Basic Brute Success:%s | user:%s | password:%s\n", Target, user, pass))
 			}
 
 		}
