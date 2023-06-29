@@ -164,7 +164,7 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, user, pass string
 					runTask(ts, thread, "mongodb")
 					break
 				}
-			case !*noWeb && !strings.Contains(tmp, ":135") && !strings.Contains(tmp, ":137") && !strings.Contains(tmp, ":139") && !strings.Contains(tmp, ":445"):
+			case !*noWeb && !strings.Contains(tmp, ":21") && !strings.Contains(tmp, ":22") && !strings.Contains(tmp, ":135") && !strings.Contains(tmp, ":139") && !strings.Contains(tmp, ":445"):
 				{
 					webts = append(webts, fmt.Sprintf("http://%s:%s", strings.Split(tmp, ":")[0], strings.Split(tmp, ":")[1]))
 					webts = append(webts, fmt.Sprintf("https://%s:%s", strings.Split(tmp, ":")[0], strings.Split(tmp, ":")[1]))
