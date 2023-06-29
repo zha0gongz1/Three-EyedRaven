@@ -1008,12 +1008,13 @@ func (v *VScan) Init() {
 	v.parseProbesToMapKName(v.Probes)
 }
 
-func GetProbes(aliveHosts *[]string) []string {
+func GetProbes(aliveHosts *[]string, thread *int) []string {
 	v := VScan{}
 	v.Init()
+	threads := *thread
 	if len(*aliveHosts) > 100 {
-		*thread = len(*aliveHosts) / 2
+		threads = len(*aliveHosts) / 2
 	}
-	TagetBanners := v.Tagetsacn(*aliveHosts, *thread)
+	TagetBanners := v.Tagetsacn(*aliveHosts, threads)
 	return TagetBanners
 }
