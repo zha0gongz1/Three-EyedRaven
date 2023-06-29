@@ -10,7 +10,7 @@ import (
 	"sync"
 )
 
-func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, user, pass string, thread *int) {
+func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 	fmt.Println("[*]Executing all module...")
 	fmt.Printf("[+]Host:%s, Ports:%s, No ping%v, No web:%v, No blasting:%v, Threads:%d\n", *ipd, *ports, *noPing, *noWeb, *noBrute, *thread)
 	var (
