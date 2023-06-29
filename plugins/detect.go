@@ -109,7 +109,7 @@ func DetectFunc(ipd *string, noPing, NoWebDetect *bool, port *string, thread *in
 	logger.PortLog(&hostPort)
 	fmt.Println("[*]Identifying port service...")
 	if len(hostPort) > 0 {
-		TagetBanners = GetProbes(&hostPort)
+		TagetBanners = GetProbes(&hostPort, thread)
 	}
 	for _, taget := range TagetBanners {
 		fmt.Println(taget)
