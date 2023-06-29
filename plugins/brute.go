@@ -46,7 +46,6 @@ type ServResult struct {
 	// 添加更多的服务类型
 }
 
-// ToDo:RDP服务多版本兼容爆破（有难度）&& mssql、redis、mongodb、mysql、rdp服务端口识别
 
 func BruteService(user, pass string, ipd *string, service *string, p1 string, thread *int) {
 	fmt.Printf("[*]Executing enumeration of %s service...\n", *service)
@@ -54,7 +53,7 @@ func BruteService(user, pass string, ipd *string, service *string, p1 string, th
 	switch {
 	case serv == "ssh":
 		if p1 != "" {
-			if strings.Contains(*ipd, "/") { //端口判定完后，进行CIDR判定
+			if strings.Contains(*ipd, "/") { 
 				ips, err := parseIP.ConvertIpFormatA(*ipd)
 				if err != nil {
 					fmt.Println("parse ips has an error")
@@ -67,14 +66,13 @@ func BruteService(user, pass string, ipd *string, service *string, p1 string, th
 				sshBrute(user, pass, ips, p1, thread, serv)
 			}
 
-		} else { //端口未设置，采取默认22端口（旧），采取服务识别端口进行爆破（新）
+		} else { 
 			if strings.Contains(*ipd, "/") {
 				ips, err := parseIP.ConvertIpFormatA(*ipd)
 				if err != nil {
 					fmt.Println("parse ips has an error")
 					return
 				}
-				//New爆破任务是针对服务识别出来的端口进行爆破的！！！
 				res := whatIsServ(ips, thread)
 				fmt.Println("[*]Detected ssh service on", res.SSH)
 				sshNewBrute(user, pass, res.SSH, serv)
@@ -1045,7 +1043,6 @@ func postgresAuth(ip string, port string, username string, password string) (res
 		err = db.Ping()
 		if err == nil {
 			temp := fmt.Sprintf("[+] Postgres:%v:%v:%v %v", ip, port, username, password)
-			//common.LogSuccess(temp)
 			fmt.Println(temp)
 			result = true
 		}
@@ -1090,7 +1087,6 @@ func runTask(tasks []Task, threads *int, serv string) {
 						if res == true && err == nil {
 							fmt.Println("[+]Found:" + task.target + " [" + task.port + "] " + task.user + " " + task.password)
 							logger.PrintBrute(task.target, "FTP", task.port, task.user, task.password)
-							//fmt.Print("\n")
 						}
 						wg.Done()
 					}
@@ -1113,7 +1109,6 @@ func runTask(tasks []Task, threads *int, serv string) {
 						if res == true && err == nil {
 							fmt.Println("[+]Found:" + task.target + " [" + task.port + "] " + task.user + " " + task.password)
 							logger.PrintBrute(task.target, "SMB", task.port, task.user, task.password)
-							//fmt.Print("\n")
 						}
 						wg.Done()
 					}
@@ -1136,7 +1131,6 @@ func runTask(tasks []Task, threads *int, serv string) {
 						if res == true && err == nil {
 							fmt.Println("[+]Found:" + task.target + " [" + task.port + "] " + task.user + " " + task.password)
 							logger.PrintBrute(task.target, "Mssql", task.port, task.user, task.password)
-							//fmt.Print("\n")
 						}
 						wg.Done()
 					}
@@ -1350,7 +1344,5 @@ func runNewTask(tasks []T1, serv string) {
 			}
 			wg.Wait()
 		}
-	default:
-		fmt.Println("暂不支持...")
 	}
 }
