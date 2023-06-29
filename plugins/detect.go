@@ -112,7 +112,7 @@ func DetectFunc(ipd *string, noPing, NoWebDetect *bool, port *string, thread *in
 		TagetBanners = GetProbes(&hostPort, thread)
 	}
 	for _, taget := range TagetBanners {
-		fmt.Println(taget)
+		//fmt.Println(taget)
 		logger.PrintInfo(taget)
 	}
 	var netInfoTemp string
