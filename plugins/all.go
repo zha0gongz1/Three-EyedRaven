@@ -30,26 +30,14 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, user, pass string
 
 	var wg1 sync.WaitGroup
 	sem := make(chan struct{}, *thread)
-	portdict := strings.Split(portdic.DefaultPorts, ",")
+	portdict := strings.Split(portdic.BasicPorts, ",")
 	temp := []HostPort{}
-	fmt.Println("[*]Loading default port dict top1000...")
-	//batchSize := 100
-	for i := 0; i < len(portdict); i += 100 {
-		portBatch := portdict[i:min(i+100, len(portdict))]
-		wg1.Add(1)
-		sem <- struct{}{}
-		go func(portBatch, aliveRes []string) {
-			defer func() {
-				<-sem
-				wg1.Done()
-			}()
-			//fmt.Println(portBatch)
-			for _, port := range portBatch {
-				for _, host := range aliveRes {
-					portScan(host, port, &temp)
-				}
-			}
-		}(portBatch, aliveRes)
+	fmt.Println("[*]Loading default basic ports dict...")
+	for _, port := range portdict { 
+		wg1.Add(len(aliveRes)) 
+		for _, host := range aliveRes {
+			go portScan2(&wg1, sem, host, port, &temp)
+		}
 	}
 	wg1.Wait()
 	var openValue []string
