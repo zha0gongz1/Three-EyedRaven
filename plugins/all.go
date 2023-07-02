@@ -12,41 +12,55 @@ import (
 
 func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 	fmt.Println("[*]Executing all module...")
-	fmt.Printf("[+]Host:%s, Ports:%s, No ping%v, No web:%v, No blasting:%v, Threads:%d\n", *ipd, *ports, *noPing, *noWeb, *noBrute, *thread)
+	fmt.Printf("[+]Host:%s, Ports:%s, No ping:%v, No web:%v, No blasting:%v, Threads:%d\n", *ipd, *ports, *noPing, *noWeb, *noBrute, *thread)
 	var (
-		aliveRes []string
-		err error
+		aliveRes  []string
+		e         string
+		strTemp   string
+		openValue []string
+		wg1       sync.WaitGroup
+		sem       = make(chan struct{}, *thread) 
 	)
 	if *noPing {
-		aliveRes, err = parseIP.ConvertIpFormatA(*ipd)
-		if err != nil {
-			fmt.Println("parse ips has an error")
+		var noPingIPs []string
+		noPingIPs, e = parseIP.ConvertIpFormatB(*ipd)
+		if e != "" {
+			fmt.Println(e)
+			return
+		}
+		temp := []HostPort{}
+		fmt.Println("[*]Loading default basic ports dict...")
+		portOper(&wg1, noPingIPs, sem, &temp)
+		for _, openHostPorts := range temp {
+			openValue = append(openValue, fmt.Sprintf("%s:%s", openHostPorts.Host, openHostPorts.Port))
+		}
+		//fmt.Println("初步探测结果：", openValue)
+		if openValue != nil {
+			temp2 := []HostPort{} 
+			otherIP := AddPortCheck(&openValue, thread)
+			fmt.Println(otherIP)
+			fmt.Println("[*]Loading test2 basic ports dict...")
+			portOper(&wg1, otherIP, sem, &temp2)
+			for _, openHostPorts := range temp2 {
+				openValue = append(openValue, fmt.Sprintf("%s:%s", openHostPorts.Host, openHostPorts.Port))
+			}
+			//fmt.Println("最终探测结果：", openValue)
+		} else {
 			return
 		}
 	} else {
 		aliveFunc(ipd, thread, &aliveRes)
 		logger.AliveLog(&aliveRes)
+		temp := []HostPort{}
+		fmt.Println("[*]Loading default basic ports dict...")
+		portOper(&wg1, aliveRes, sem, &temp)
+		for _, openHostPorts := range temp {
+			openValue = append(openValue, fmt.Sprintf("%s:%s", openHostPorts.Host, openHostPorts.Port))
+		}		
 	}
 
-	var wg1 sync.WaitGroup
-	sem := make(chan struct{}, *thread)
-	portdict := strings.Split(portdic.BasicPorts, ",")
-	temp := []HostPort{}
-	fmt.Println("[*]Loading default basic ports dict...")
-	for _, port := range portdict { 
-		wg1.Add(len(aliveRes)) 
-		for _, host := range aliveRes {
-			go portScan2(&wg1, sem, host, port, &temp)
-		}
-	}
-	wg1.Wait()
-	var openValue []string
-	for _, openHostPorts := range temp {
-		openValue = append(openValue, fmt.Sprintf("%s:%s", openHostPorts.Host, openHostPorts.Port))
-	}
 	logger.PortLog(&openValue)
 
-	var strTemp string
 	for _, tmp := range openValue {
 		if strings.Contains(tmp, ":139") {
 			strTemp += netbiosDetect(tmp)
@@ -178,6 +192,18 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 	wgBrute.Wait()
 
 }
+
+func portOper(wg *sync.WaitGroup, ipArr []string, sem chan struct{}, openHostPorts *[]HostPort) {
+	portdict := strings.Split(portdic.BasicPorts, ",")
+	for _, port := range portdict {
+		wg.Add(len(ipArr))
+		for _, host := range ipArr {
+			go portScan2(wg, sem, host, port, openHostPorts)
+		}
+	}
+	wg.Wait()
+}
+
 func min(a, b int) int {
 	if a < b {
 		return a
