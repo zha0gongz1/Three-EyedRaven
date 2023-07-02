@@ -126,3 +126,92 @@ func ConvertPort(ports *string) []string {
 	//解析 80,135-139端口参数的
 }
 
+func ConvertIpFormatB(ipd string) ([]string, string) {
+	var ipArr []string
+	switch {
+	case strings.Contains(ipd, "/8"):
+		{
+			realIP := ipd[:len(ipd)-2]
+			testIP := net.ParseIP(realIP)
+			if testIP == nil {
+				return nil, "parse ips has an error"
+			}
+			ipArr = parseIP8(ipd)
+			return ipArr, ""
+		}
+	case strings.Contains(ipd, "/16"):
+		{
+			realIP := ipd[:len(ipd)-3]
+			testIP := net.ParseIP(realIP)
+			if testIP == nil {
+				return nil, "parse ips has an error"
+			}
+			ipArr = parseIP16(ipd)
+			return ipArr, ""
+
+		}
+	case strings.Contains(ipd, "/24"):
+		{
+			ips, err := ConvertIpFormatA(ipd)
+			if err != nil {
+				return nil, ""
+			}
+			return ips, ""
+		}
+	default:
+		if net.ParseIP(ipd) != nil {
+			fmt.Println("ipd：", ipd)
+
+		} else {
+			return nil, "parse ips has an error"
+		}
+	}
+	return nil, ""
+}
+
+func parseIP8(ip string) []string {
+	IPrange := strings.Split(ip, ".")[0]
+	var AllIP []string
+	for a := 0; a <= 255; a++ {
+		for b := 0; b <= 255; b++ {
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, 1))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, 2))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, 4))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, RandInt(6, 55)))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, RandInt(56, 100)))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, RandInt(101, 150)))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, RandInt(151, 200)))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, RandInt(201, 253)))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, 254))
+			AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d.%d", IPrange, a, b, 255))
+		}
+	}
+	return AllIP
+}
+
+func parseIP16(ip string) []string {
+	re := regexp.MustCompile(`^(\d{1,3}\.\d{1,3})`)
+	realIP := re.FindStringSubmatch(ip)
+
+	var AllIP []string
+	for a := 0; a <= 255; a++ {
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, 1))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, 2))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, 4))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, RandInt(6, 55)))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, RandInt(56, 100)))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, RandInt(101, 150)))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, RandInt(151, 200)))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, RandInt(201, 253)))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, 254))
+		AllIP = append(AllIP, fmt.Sprintf("%s.%d.%d", realIP[1], a, 255))
+	}
+	return AllIP
+}
+
+func RandInt(min, max int) int {
+	if min >= max || min == 0 || max == 0 {
+		return max
+	}
+	return rand.Intn(max-min) + min
+}
