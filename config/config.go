@@ -163,13 +163,13 @@ func ConvertIpFormatB(ipd string) ([]string, string) {
 		}
 	default:
 		if net.ParseIP(ipd) != nil {
-			fmt.Println("ipd：", ipd)
+			ipArr = append(ipArr, ipd)
+			return ipArr, ""
 
 		} else {
 			return nil, "parse ips has an error"
 		}
 	}
-	return nil, ""
 }
 
 func parseIP8(ip string) []string {
