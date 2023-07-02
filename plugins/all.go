@@ -35,7 +35,8 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 			openValue = append(openValue, fmt.Sprintf("%s:%s", openHostPorts.Host, openHostPorts.Port))
 		}
 		//fmt.Println("初步探测结果：", openValue)
-		if openValue != nil {
+		ipIF := net.ParseIP(*ipd)
+		if openValue != nil && ipIF == nil{
 			temp2 := []HostPort{} 
 			otherIP := AddPortCheck(&openValue, thread)
 			fmt.Println(otherIP)
@@ -45,6 +46,8 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 				openValue = append(openValue, fmt.Sprintf("%s:%s", openHostPorts.Host, openHostPorts.Port))
 			}
 			//fmt.Println("最终探测结果：", openValue)
+		} else if ipIF != nil {
+			//fmt.Println(ipIF)
 		} else {
 			return
 		}
