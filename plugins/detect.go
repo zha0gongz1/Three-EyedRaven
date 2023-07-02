@@ -304,6 +304,39 @@ func portScan2(wg *sync.WaitGroup, sem chan struct{}, hostname string, port stri
 
 }
 
+func AddPortCheck(ips *[]string, thread *int) []string {
+	var ipArray, resIPArr []string
+	for _, str := range *ips {
+		splitStr := strings.Split(str, ":")
+		ipArray = append(ipArray, splitStr[0])
+	}
+	cMap := make(map[string][]string)
+	for _, ip := range ipArray {
+		splitIP := strings.Split(ip, ".")
+		cID := strings.Join(splitIP[:3], ".")
+		cMap[cID] = append(cMap[cID], ip)
+	}
+
+	for cID, ips := range cMap {
+		for i := 1; i < 256; i++ {
+			ip := fmt.Sprintf("%s.%d", cID, i)
+			if !contains(ips, ip) {
+				resIPArr = append(resIPArr, ip)
+			}
+		}
+	}
+	return resIPArr
+}
+
+func contains(slice []string, item string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+	_, ok := set[item]
+	return ok
+}
+
 func readBytes(conn net.Conn) (result []byte, err error) {
 	size := 4096
 	buf := make([]byte, size)
