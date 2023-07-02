@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func aliveFunc(ipd *string, thead *int, res *[]string) {
+func aliveFunc(ipd *string, thread *int, res *[]string) {
 	if strings.Contains(*ipd, "/") {
 		if strings.Contains(*ipd, "/24") {
 			ips, err := parseIP.ConvertIpFormatA(*ipd)
