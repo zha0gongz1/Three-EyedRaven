@@ -15,22 +15,30 @@ import (
 
 func aliveFunc(ipd *string, thead *int, res *[]string) {
 	if strings.Contains(*ipd, "/") {
-		ips, err := parseIP.ConvertIpFormatA(*ipd)
-		if err != nil {
-			fmt.Println("parse ips has an error")
-			return
+		if strings.Contains(*ipd, "/24") {
+			ips, err := parseIP.ConvertIpFormatA(*ipd)
+			if err != nil {
+				fmt.Println("parse ips has an error")
+				return
+			}
+			SubAliveFunc(&ips, thread, res)
+		} else {
+			ips, e := parseIP.ConvertIpFormatB(*ipd)
+			if e != "" {
+				fmt.Println("parse ips has an error")
+				return
+			}
+			//fmt.Println(ips)
+			checkCIDRAlive(&ips, thread, res)
 		}
-		subAliveFunc(&ips, thead, res)
 	} else {
 		var temp []string
 		temp = append(temp, *ipd)
-		subAliveFunc(&temp, thead, res)
+		SubAliveFunc(&temp, thread, res)
 	}
-
 }
 
-func subAliveFunc(ips *[]string, thread *int, res *[]string) {
-
+func SubAliveFunc(ips *[]string, thread *int, res *[]string) {
 	conn, err := icmp.ListenPacket("ip4:icmp", "127.0.0.1")
 	conn.Close()
 	ch := make(chan struct{}, *thread)
@@ -66,6 +74,50 @@ func subAliveFunc(ips *[]string, thread *int, res *[]string) {
 			}(ip)
 		}
 		wg.Wait()
+	}
+}
+
+func checkCIDRAlive(ipd *[]string, thread *int, res *[]string) {
+	SubAliveFunc(ipd, thread, res)
+	if *res != nil {
+		AddIPCheck(res, thread)
+	} else {
+		return
+	}
+}
+
+func AddIPCheck(ips *[]string, thread *int) {
+	var ip_temp, res_temp []string
+	cClassIPs := make(map[string]string)
+	for _, ipAddress := range *ips {
+		parts := strings.Split(ipAddress, ".")
+		if len(parts) == 4 {
+			cClass := strings.Join(parts[:3], ".")
+			if _, ok := cClassIPs[cClass]; !ok {
+				cClassIPs[cClass] = ipAddress
+			}
+		}
+	}
+	for prefix, _ := range cClassIPs {
+		for i := 0; i <= 255; i++ {
+			ip := fmt.Sprintf("%s.%d", prefix, i)
+			found := false
+			for _, v := range *ips {
+				if v == ip {
+					found = true
+					break
+				}
+			}
+			if !found {
+				ip_temp = append(ip_temp, ip)
+			}
+
+		}
+	}
+	//fmt.Println("Add Complete IP:", ip_temp)
+	SubAliveFunc(&ip_temp, thread, &res_temp)
+	if res_temp != nil {
+		*ips = append(*ips, res_temp...)
 	}
 }
 
