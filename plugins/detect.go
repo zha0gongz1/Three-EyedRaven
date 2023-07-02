@@ -79,33 +79,32 @@ func DetectFunc(ipd *string, noPing, NoWebDetect *bool, port *string, thread *in
 	var (
 		aliveRes []string
 		hostPort []string
-		err      error
+		e            string
 		TagetBanners []string
 	)
 	if *noPing {
-		aliveRes, err = parse.ConvertIpFormatA(*ipd)
-		if err != nil {
-			fmt.Println("parse ips has an error")
+		var noPingIPs []string
+		noPingIPs, e = parse.ConvertIpFormatB(*ipd)
+		if e != "" {
+			fmt.Println(e)
+			return
+		}
+		detectPortOper(&noPingIPs, port, thread, &hostPort)
+		ipIF := net.ParseIP(*ipd)
+		if hostPort != nil && ipIF == nil {
+			otherIP := AddPortCheck(&hostPort, thread)
+			var temp []string
+			detectPortOper(&otherIP, port, thread, &temp)
+			hostPort = append(hostPort, temp...)
+		} else if ipIF != nil {
+		} else {
 			return
 		}
 	} else {
 		aliveFunc(ipd, thread, &aliveRes)
 		logger.AliveLog(&aliveRes)
 	}
-	switch {
-	case !strings.Contains(*port, ",") && !strings.Contains(*port, "-") && *port != "":
-		fmt.Println("[*]Scaning one port...")
-		hostPort = detectPort2(&aliveRes, port, thread)
-		break
-	case strings.Contains(*port, ",") || strings.Contains(*port, "-"):
-		fmt.Println("[*]Loading the specified port scanning method...")
-		hostPort = detectPort2(&aliveRes, port, thread)
-		break
-	default:
-		fmt.Println("[*]Loading default port dictionary top1000...")
-		hostPort = detectPort(&aliveRes, thread)
-		break
-	}
+	
 	logger.PortLog(&hostPort)
 	fmt.Println("[*]Identifying port service...")
 	if len(hostPort) > 0 {
@@ -302,6 +301,23 @@ func portScan2(wg *sync.WaitGroup, sem chan struct{}, hostname string, port stri
 	*openHostPorts = append(*openHostPorts, HostPort{hostname, port})
 	<-sem
 
+}
+
+func detectPortOper(ipd *[]string, port *string, thread *int, hostPort *[]string) {
+	switch {
+	case !strings.Contains(*port, ",") && !strings.Contains(*port, "-") && *port != "":
+		fmt.Println("[*]Scaning one port...")
+		*hostPort = detectPort2(ipd, port, thread)
+		break
+	case strings.Contains(*port, ",") || strings.Contains(*port, "-"):
+		fmt.Println("[*]Loading the specified port scanning method...")
+		*hostPort = detectPort2(ipd, port, thread)
+		break
+	default:
+		fmt.Println("[*]Loading default port dictionary top1000...")
+		*hostPort = detectPort(ipd, thread)
+		break
+	}
 }
 
 func AddPortCheck(ips *[]string, thread *int) []string {
