@@ -39,8 +39,6 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 		if openValue != nil && ipIF == nil{
 			temp2 := []HostPort{} 
 			otherIP := AddPortCheck(&openValue, thread)
-			fmt.Println(otherIP)
-			fmt.Println("[*]Loading test2 basic ports dict...")
 			portOper(&wg1, otherIP, sem, &temp2)
 			for _, openHostPorts := range temp2 {
 				openValue = append(openValue, fmt.Sprintf("%s:%s", openHostPorts.Host, openHostPorts.Port))
