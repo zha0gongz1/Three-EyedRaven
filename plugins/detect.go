@@ -103,6 +103,7 @@ func DetectFunc(ipd *string, noPing, NoWebDetect *bool, port *string, thread *in
 	} else {
 		aliveFunc(ipd, thread, &aliveRes)
 		logger.AliveLog(&aliveRes)
+		detectPortOper(&aliveRes, port, thread, &hostPort)
 	}
 	
 	logger.PortLog(&hostPort)
