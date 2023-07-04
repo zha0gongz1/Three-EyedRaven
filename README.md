@@ -14,16 +14,16 @@
 ``` bash
 Three-EyedRaven help             #帮助文档
 
-#探测C段主机存活，内置端口字典探测并对结果中存在的可爆破服务进行暴力枚举（内置用户密码字典）
+#探测C段主机存活，内置基础端口字典（25个）探测并对结果中存在的可爆破服务进行暴力枚举（内置用户密码字典）
 Three-EyedRaven all -H 192.168.233.1/24 
 
 #设定500线程进行all模块探测，禁用爆破模块及web探测（包括401爆破）
 Three-EyedRaven all -H 192.168.233.1/24 --nw --nb -t 500
 
-#探测C段存活主机，内置端口字典探测，web title识别及401基础认证爆破
+#探测C段存活主机，内置top1000端口字典探测，web title识别及401基础认证爆破
 Three-EyedRaven detect -H 192.168.233.1/24
 
-#设定300线程探测C段存活主机，内置端口字典探测，禁用web title识别及401基础认证爆破
+#设定300线程探测C段存活主机，内置top1000端口字典探测，禁用web title识别及401基础认证爆破
 Three-EyedRaven detect -H 192.168.233.1/24 --nw -t 300
 
 #探测B段存活主机及其135-139、445、8000-9000端口的开放情况
@@ -43,7 +43,7 @@ Three-EyedRaven brute -H 192.168.233.11 -S ftp -t 50 -p pass.txt
 
 - RDP服务认证爆破；
 
-- 检测端口，识别SqlServer、Mysql、Redis等服务；
+- ~~检测端口，识别SqlServer、Mysql、Redis等服务；~~
 
 ## License
 
