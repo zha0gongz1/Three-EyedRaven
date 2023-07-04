@@ -119,7 +119,6 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 				}
 			case !*noBrute && strings.Contains(tmp, ":1433"):
 				{
-					fmt.Println("SqlServer")
 					for _, userDict := range portdic.Users["mssql"] {
 						for _, passDict := range portdic.Passwords {
 							ts = append(ts, Task{strings.Split(tmp, ":")[0], "1433", userDict, passDict})
