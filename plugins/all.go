@@ -24,8 +24,7 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 	if *noPing {
 		var noPingIPs []string
 		noPingIPs, e = parseIP.ConvertIpFormatB(*ipd)
-		if e != "" {
-			fmt.Println(e)
+		if len(e) != 0 {
 			return
 		}
 		temp := []HostPort{}
