@@ -85,8 +85,7 @@ func DetectFunc(ipd *string, noPing, NoWebDetect *bool, port *string, thread *in
 	if *noPing {
 		var noPingIPs []string
 		noPingIPs, e = parse.ConvertIpFormatB(*ipd)
-		if e != "" {
-			fmt.Println(e)
+		if len(e) != 0 {
 			return
 		}
 		detectPortOper(&noPingIPs, port, thread, &hostPort)
