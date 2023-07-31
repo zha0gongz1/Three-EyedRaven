@@ -545,15 +545,44 @@ func ftpNewBrute(userDict, passDict string, Target []string, serv string) {
 	}
 }
 
+func filter(slice []string, f func(string) bool) []string {
+	result := make([]string, 0)
+	for _, s := range slice {
+		if f(s) {
+			result = append(result, s)
+		}
+	}
+	return result
+}
+
 func smbBrute(userDict, passDict string, Target []string, port string, threads *int, serv string) {
 	res := make(chan []string)
 	go portCheck(Target, port, res)
 	openHosts := <-res
+	p2, _ := strconv.Atoi(port)
+	openHostsRes := filter(openHosts, func(ip string) bool {
+		options := smb.Options{
+			Host:        ip,
+			Port:        p2,
+			User:        "",
+			Password:    "",
+			Domain:      "",
+			Workstation: "",
+		}
+		session, err := smb.NewSession(options, false)
+		if err != nil {
+			return true
+		}
+		defer session.Close()
+		fmt.Println("[*]" + ip + " SMB allows anonymous access!")
+		logger.PrintInfo("[*]" + ip + " SMB allows anonymous access")
+		return !session.IsAuthenticated
+	})
 	if dict.PassIsExist(passDict) {
 		if dict.UserIsExist(userDict) {
 			for _, userDict := range dict.UserDict(userDict) {
 				for _, passDict := range dict.PassDict(passDict) {
-					for _, ipDict := range openHosts {
+					for _, ipDict := range openHostsRes {
 						tasks = append(tasks, Task{ipDict, port, userDict, passDict})
 					}
 				}
@@ -562,7 +591,7 @@ func smbBrute(userDict, passDict string, Target []string, port string, threads *
 			fmt.Println("[*]No user dict specified! Using built-in user dict")
 			for _, userDict := range dict.Users["smb"] {
 				for _, passDict := range dict.PassDict(passDict) {
-					for _, ipDict := range openHosts {
+					for _, ipDict := range openHostsRes {
 						tasks = append(tasks, Task{ipDict, port, userDict, passDict})
 					}
 				}
@@ -576,7 +605,7 @@ func smbBrute(userDict, passDict string, Target []string, port string, threads *
 		fmt.Println("[*]Using the built-in user && password dict to blast!")
 		for _, userDict := range dict.Users["smb"] {
 			for _, passDict := range dict.Passwords {
-				for _, ipDict := range openHosts {
+				for _, ipDict := range openHostsRes {
 					tasks = append(tasks, Task{ipDict, port, userDict, passDict})
 				}
 			}
@@ -587,7 +616,7 @@ func smbBrute(userDict, passDict string, Target []string, port string, threads *
 		fmt.Println("[*]No password dict specified! Using built-in password dict")
 		for _, userDict := range dict.UserDict(userDict) {
 			for _, passDict := range dict.Passwords {
-				for _, ipDict := range openHosts {
+				for _, ipDict := range openHostsRes {
 					tasks = append(tasks, Task{ipDict, port, userDict, passDict})
 				}
 			}
