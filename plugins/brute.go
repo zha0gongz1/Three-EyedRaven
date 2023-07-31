@@ -16,6 +16,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/mgo.v2"
 	"net"
+	"strconv"
 	"os"
 	"strings"
 	"sync"
@@ -574,8 +575,8 @@ func smbBrute(userDict, passDict string, Target []string, port string, threads *
 			return true
 		}
 		defer session.Close()
-		fmt.Println("[*]" + ip + " SMB allows anonymous access!")
-		logger.PrintInfo("[*]" + ip + " SMB allows anonymous access")
+		fmt.Println("[+]" + ip + " SMB allows anonymous access!")
+		logger.PrintInfo("[+]" + ip + " SMB allows anonymous access")
 		return !session.IsAuthenticated
 	})
 	if dict.PassIsExist(passDict) {
