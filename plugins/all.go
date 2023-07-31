@@ -5,6 +5,7 @@ import (
 	portdic "Three-EyedRaven/config"
 	parseIP "Three-EyedRaven/config"
 	"fmt"
+	"github.com/stacktitan/smb/smb"
 	"net"
 	"strings"
 	"sync"
@@ -109,13 +110,30 @@ func AllFunc(ipd, ports *string, noPing, noWeb, noBrute *bool, thread *int) {
 				}
 			case !*noBrute && strings.Contains(tmp, ":445"):
 				{
-					for _, userDict := range portdic.Users["smb"] {
-						for _, passDict := range portdic.Passwords {
-							ts = append(ts, Task{strings.Split(tmp, ":")[0], "445", userDict, passDict})
-						}
+					options := smb.Options{
+						Host:        strings.Split(tmp, ":")[0],
+						Port:        445,
+						User:        "",
+						Password:    "",
+						Domain:      "",
+						Workstation: "",
 					}
-					runTask(ts, thread, "smb")
-					break
+					session, err := smb.NewSession(options, false)
+					defer session.Close()
+					if err == nil {
+						if session.IsAuthenticated {
+							fmt.Println("[+]" + strings.Split(tmp, ":")[0] + " SMB allows anonymous access!")
+							logger.PrintInfo("[+]" + strings.Split(tmp, ":")[0] + " SMB allows anonymous access")
+						}
+					} else {
+						for _, userDict := range portdic.Users["smb"] {
+							for _, passDict := range portdic.Passwords {
+								ts = append(ts, Task{strings.Split(tmp, ":")[0], "445", userDict, passDict})
+							}
+						}
+						runTask(ts, thread, "smb")
+					}
+					break			
 				}
 			case !*noBrute && strings.Contains(tmp, ":1433"):
 				{
