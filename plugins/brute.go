@@ -354,7 +354,6 @@ func sshBrute(userDict, passDict string, Target []string, port string, threads *
 				for _, passDict := range dict.PassDict(passDict) {
 					for _, ipDict := range openHosts { //密码喷洒（一组密码对应多个IP尝试）
 						tasks = append(tasks, Task{ipDict, port, userDict, passDict})
-						fmt.Println(tasks)
 					}
 				}
 			}
@@ -740,7 +739,6 @@ func mongodbBrute(userDict, passDict string, Target []string, port string, threa
 				for _, passDict := range dict.PassDict(passDict) {
 					for _, ipDict := range openHosts { //密码喷洒（一组密码对应多个IP尝试）
 						tasks = append(tasks, Task{ipDict, port, userDict, passDict})
-						fmt.Println(tasks)
 					}
 				}
 			}
@@ -789,7 +787,6 @@ func postgresBrute(userDict, passDict string, Target []string, port string, thre
 				for _, passDict := range dict.PassDict(passDict) {
 					for _, ipDict := range openHosts { //密码喷洒（一组密码对应多个IP尝试）
 						tasks = append(tasks, Task{ipDict, port, userDict, passDict})
-						fmt.Println(tasks)
 					}
 				}
 			}
