@@ -610,34 +610,38 @@ func trimBanner(buf []byte) string {
 	if strings.Contains(bufStr, "SMB") {
 		banner := hex.EncodeToString(buf)
 		if banner[0xa:0xa+6] == "534d42" {
-			plain := banner[0xa2:]
-			data, _ := hex.DecodeString(plain)
-			var domain = ""
-			var index = 0
-			for _, s := range data {
-				index += 1
-				if s != 0 {
-					domain = domain + string(s)
-				} else {
-					if data[index] == 0 && data[index+1] == 0 {
-						index += 1
+			if len(banner) < 0xa2 { 
+				//println("This Banner is :" + banner)
+			} else {
+				plain := banner[0xa2:]
+				data, _ := hex.DecodeString(plain)
+				var domain = ""
+				var index = 0
+				for _, s := range data {
+					index += 1
+					if s != 0 {
+						domain = domain + string(s)
+					} else {
+						if index < len(data)-1 && data[index] == 0 && data[index+1] == 0 { 
+							index += 1
+							break
+						}
+					}
+				}
+				var hostname = ""
+				var index2 = 0
+				for _, h := range data[index:] {
+					index2 += 1
+					if h != 0 {
+						hostname = hostname + string(h)
+					}
+					if index2 < len(data[index:])-1 && data[index:][index2] == 0 && data[index:][index2+1] == 0 { 
 						break
 					}
 				}
+				smb_banner := "hostname: " + hostname + " domain: " + domain
+				return smb_banner
 			}
-			var hostname = ""
-			var index2 = 0
-			for _, h := range data[index:] {
-				index2 += 1
-				if h != 0 {
-					hostname = hostname + string(h)
-				}
-				if data[index:][index2] == 0 && data[index:][index2+1] == 0 {
-					break
-				}
-			}
-			smb_banner := "hostname: " + hostname + " domain: " + domain
-			return smb_banner
 		}
 	}
 
